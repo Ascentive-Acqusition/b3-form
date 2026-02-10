@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Let's Connect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-yellow: #FFD700;
+            --dark-bg: #0A0A0A;
+            --card-bg: #1A1A1A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --border-color: #2A2A2A;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .route-note {
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 2px;
+            background: var(--border-color);
+            margin-bottom: 50px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-yellow);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+        }
+
+        .question-label {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .question-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .option-cards {
+            display: grid;
+            gap: 16px;
+        }
+
+        .option-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-yellow), transparent);
+            opacity: 0.1;
+            transition: width 0.4s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-yellow);
+            transform: translateX(4px);
+        }
+
+        .option-card:hover::before {
+            width: 100%;
+        }
+
+        .option-card.selected {
+            border-color: var(--primary-yellow);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .option-card input[type="radio"],
+        .option-card input[type="checkbox"] {
+            display: none;
+        }
+
+        .option-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-title::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .option-card.selected .option-title::before {
+            background: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            box-shadow: inset 0 0 0 4px var(--card-bg);
+        }
+
+        .option-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-left: 32px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 16px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary-yellow);
+        }
+
+        .checkbox-item.selected {
+            border-color: var(--primary-yellow);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .checkbox-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            gap: 12px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            appearance: none;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked {
+            background: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--dark-bg);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 50px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-next {
+            background: var(--primary-yellow);
+            color: var(--dark-bg);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+
+        .success-screen {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--dark-bg);
+            stroke-width: 3;
+        }
+
+        .success-screen h2 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .success-screen p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .route-indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--primary-yellow);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .question-label {
+                font-size: 20px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .button-group {
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LET'S CONNECT</h1>
+            <p>Choose your path and we'll guide you through the right questions</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <form id="masterForm">
+            <!-- INITIAL ROUTE SELECTION -->
+            <div class="form-section active" data-section="route-select">
+                <div class="question-block">
+                    <label class="question-label">What brings you here today?</label>
+                    <p class="question-description">Select the option that best describes your needs</p>
+
+                    <div class="option-cards">
+                        <div class="option-card" onclick="selectRoute(this, 'client')">
+                            <input type="radio" name="route" value="client">
+                            <div class="option-title">I want to work with you</div>
+                            <div class="option-description">I'm looking for services and want to start a project with
+                                your team</div>
+                            <div class="route-note">(Lead magnet routed to here)</div>
+                        </div>
+
+                        <div class="option-card" onclick="selectRoute(this, 'partner')">
+                            <input type="radio" name="route" value="partner">
+                            <div class="option-title">I want to work for you / partner</div>
+                            <div class="option-description">Exploring job opportunities, freelance work, or creative
+                                partnerships</div>
+                        </div>
+
+                        <div class="option-card" onclick="selectRoute(this, 'learner')">
+                            <input type="radio" name="route" value="learner">
+                            <div class="option-title">I want to learn</div>
+                            <div class="option-description">Access resources, guides, and educational materials</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-next" onclick="startRoute()" disabled
+                        id="startBtn">Continue</button>
+                </div>
+            </div>
+
+            <!-- CLIENT PATH (Form A) - Single Page -->
+            <div class="form-section" data-section="client">
+                <span class="route-indicator">Client Path</span>
+
+                <div class="question-block">
+                    <label class="question-label">Let's start with the basics</label>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="client_name" placeholder="Your name *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="email" name="client_email" placeholder="Email address *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="client_company" placeholder="Company name *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="client_role" placeholder="Your role *" required>
+                    </div>
+
+                    <div>
+                        <input type="url" name="client_linkedin" placeholder="LinkedIn URL (optional)">
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">What's the main challenge you're facing?</label>
+                    <p class="question-description">Help us understand what's keeping you up at night</p>
+                    <textarea name="client_challenge" placeholder="Describe your biggest challenge..."
+                        required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">How urgent is this for you?</label>
+                    <p class="question-description">This helps us prioritize and serve you better</p>
+                    <div class="option-cards">
+                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'very_urgent')">
+                            <input type="radio" name="client_urgency" value="very_urgent">
+                            <div class="option-title">Very urgent - need help now</div>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'somewhat_urgent')">
+                            <input type="radio" name="client_urgency" value="somewhat_urgent">
+                            <div class="option-title">Somewhat urgent - within the next few weeks</div>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'exploring')">
+                            <input type="radio" name="client_urgency" value="exploring">
+                            <div class="option-title">Just exploring - gathering information</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
+                    <button type="button" class="btn-next" onclick="submitForm()">Submit</button>
+                </div>
+            </div>
+
+            <!-- PARTNERSHIP PATH (Form B) - Single Page -->
+            <div class="form-section" data-section="partner">
+                <span class="route-indicator">Partnership Path</span>
+
+                <div class="question-block">
+                    <label class="question-label">Tell us about yourself</label>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="partner_name" placeholder="Your name *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="email" name="partner_email" placeholder="Email address *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="partner_company" placeholder="Current company (optional)">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="url" name="partner_linkedin" placeholder="LinkedIn URL *" required>
+                    </div>
+
+                    <div>
+                        <input type="tel" name="partner_phone" placeholder="Phone number (optional)">
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">What type of opportunity are you looking for?</label>
+                    <p class="question-description">Select all that apply</p>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="partner_type" value="fulltime">
+                                Full-time Employment
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="partner_type" value="freelance">
+                                Freelance / Contract Work
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="partner_type" value="collaboration">
+                                Creative Collaboration
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="partner_type" value="influencer">
+                                Influencer / Creator Partnership
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="partner_type" value="internship">
+                                Internship
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">What role or position are you interested in?</label>
+                    <p class="question-description">e.g., Social Media Manager, Creative Director, Content Creator,
+                        Brand Strategist</p>
+                    <input type="text" name="partner_role" placeholder="Describe the role you're seeking..." required>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">Tell us about your experience</label>
+                    <p class="question-description">Share your relevant background, skills, and what makes you unique
+                    </p>
+                    <textarea name="partner_experience"
+                        placeholder="Describe your experience, skills, and achievements..." required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">Portfolio URL (optional)</label>
+                    <p class="question-description">Share your work so we can see what you're all about</p>
+                    <input type="url" name="partner_portfolio" placeholder="https://...">
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">Why do you want to work with us?</label>
+                    <textarea name="partner_why" placeholder="What draws you to our company and this opportunity..."
+                        required></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
+                    <button type="button" class="btn-next" onclick="submitForm()">Submit</button>
+                </div>
+            </div>
+
+            <!-- LEARNER PATH (Form C) - Single Page -->
+            <div class="form-section" data-section="learner">
+                <span class="route-indicator">Learning Resources</span>
+
+                <div class="question-block">
+                    <label class="question-label">Get access to our resources</label>
+                    <p class="question-description">We'll send you exclusive content and learning materials</p>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="learner_name" placeholder="Your name *" required>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="email" name="learner_email" placeholder="Email address *" required>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <label class="question-label">What topics interest you?</label>
+                    <p class="question-description">Select all that apply to get personalized resources</p>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="learner_topics" value="marketing">
+                                Influencer Marketing
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="learner_topics" value="branding">
+                                Brand Strategy
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="learner_topics" value="creative">
+                                Creative Direction
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="learner_topics" value="social">
+                                Social Media Strategy
+                            </label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <label>
+                                <input type="checkbox" name="learner_topics" value="trends">
+                                Culture & Trends
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
+                    <button type="button" class="btn-next" onclick="submitForm()">Get Resources</button>
+                </div>
+            </div>
+
+            <!-- SUCCESS SCREEN -->
+            <div class="form-section" data-section="success">
+                <div class="success-screen">
+                    <div class="success-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h2>THANK YOU</h2>
+                    <p id="successMessage">We've received your submission and will be in touch soon.</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentRoute = '';
+        let currentSection = 'route-select';
+
+        // Check for URL parameters on page load
+        window.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const route = urlParams.get('route');
+
+            if (route && ['client', 'partner', 'learner'].includes(route)) {
+                // Auto-select route and start
+                currentRoute = route;
+                document.querySelector(`input[value="${route}"]`).checked = true;
+                document.querySelector(`input[value="${route}"]`).parentElement.classList.add('selected');
+
+                // Skip initial selection and go directly to form
+                hideAllSections();
+                showSection(route);
+                updateProgress();
+            }
+        });
+
+        function selectRoute(card, route) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+
+            // Add selected class to clicked card
+            card.classList.add('selected');
+
+            // Set route
+            currentRoute = route;
+            card.querySelector('input').checked = true;
+
+            // Enable start button
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function startRoute() {
+            hideAllSections();
+            showSection(currentRoute);
+            updateProgress();
+        }
+
+        function goBack() {
+            hideAllSections();
+            currentRoute = '';
+            currentSection = 'route-select';
+            document.getElementById('startBtn').disabled = true;
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            showSection('route-select');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideAllSections() {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+        }
+
+        function showSection(sectionId) {
+            currentSection = sectionId;
+            const section = document.querySelector(`[data-section="${sectionId}"]`);
+            if (section) {
+                section.classList.add('active');
+            }
+        }
+
+        function updateProgress() {
+            let progress = 0;
+
+            if (currentSection === 'route-select') {
+                progress = 0;
+            } else if (currentSection === 'success') {
+                progress = 100;
+            } else if (currentRoute) {
+                // Single page form, so it's 50% when on form, 100% when submitted
+                progress = 50;
+            }
+
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function validateCurrentSection() {
+            const currentSectionEl = document.querySelector(`[data-section="${currentSection}"]`);
+            const requiredInputs = currentSectionEl.querySelectorAll('input[required], textarea[required], select[required]');
+
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim() && input.type !== 'checkbox' && input.type !== 'radio') {
+                    isValid = false;
+                    input.style.borderColor = '#ff6b6b';
+                    setTimeout(() => {
+                        input.style.borderColor = '';
+                    }, 2000);
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill in all required fields');
+            }
+
+            return isValid;
+        }
+
+        function toggleCheckbox(item) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        }
+
+        function selectOption(card, name, value) {
+            // Remove selected class from all cards with the same name
+            document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            // Add selected class to clicked card
+            card.classList.add('selected');
+
+            // Set the radio button value
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+
+        function submitForm() {
+            if (!validateCurrentSection()) {
+                return;
+            }
+
+            // Collect form data
+            const formData = new FormData(document.getElementById('masterForm'));
+            const data = {
+                route: currentRoute,
+                timestamp: new Date().toISOString(),
+                urlParam: `?route=${currentRoute}` // For reference
+            };
+
+            for (let [key, value] of formData.entries()) {
+                if (formData.getAll(key).length > 1) {
+                    data[key] = formData.getAll(key);
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            // Log to console (in production, send to your backend)
+            console.log('Form submitted:', data);
+            console.log('Direct URL parameter for this route:', `?route=${currentRoute}`);
+
+            // Set success message based on route
+            let message = '';
+            if (currentRoute === 'client') {
+                message = "Thank you for your interest! We'll review your needs and get back to you within 24 hours to discuss how we can help.";
+            } else if (currentRoute === 'partner') {
+                message = "Thanks for reaching out! We'll review your application and contact you if there's a good fit for our team.";
+            } else if (currentRoute === 'learner') {
+                message = "Perfect! Check your email for access to our exclusive resources and learning materials.";
+            }
+
+            document.getElementById('successMessage').textContent = message;
+
+            // Show success screen
+            hideAllSections();
+            showSection('success');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+
+</html>
