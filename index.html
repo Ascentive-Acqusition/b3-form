@@ -821,7 +821,7 @@
             }
         }
 
-        function submitForm() {
+        async function submitForm() {
             if (!validateCurrentSection()) {
                 return;
             }
@@ -849,10 +849,79 @@
             // Set success message based on route
             let message = '';
             if (currentRoute === 'client') {
+
+
+                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: "A",
+                        name: data.client_name,
+                        email: data.client_email,
+                        company_name: data.client_company,
+                        role: data.client_role,
+                        linkedin_url: data.client_linkedin,
+                        main_challange: data.client_challenge,
+                        urgency: data.client_urgency,
+                    })
+                })
+
+                const resData = await res.json();
+
+                if (!res.ok) {
+                    return alert("Form not submitted, Please try again later!");
+                }
+
+
+
                 message = "Thank you for your interest! We'll review your needs and get back to you within 24 hours to discuss how we can help.";
             } else if (currentRoute === 'partner') {
+                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: "B",
+                        name: data.partner_name,
+                        email: data.partner_email,
+                        current_company: data.partner_company,
+                        linkedin_url: data.partner_linkedin,
+                        phone: data.partner_phone,
+                        oppurtunity_type: data.partner_type,
+                        role_interest: data.partner_role,
+                        experience: data.partner_experience,
+                        portfolio_url: data.partner_portfolio,
+
+                    })
+                })
+
+                if (!res.ok) {
+                    return alert("Form not submitted, Please try again later!");
+                }
+
+                // console.log(data);
                 message = "Thanks for reaching out! We'll review your application and contact you if there's a good fit for our team.";
             } else if (currentRoute === 'learner') {
+                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: "C",
+                        name: data.learner_name,
+                        email: data.learner_email,
+                        topics: data.learner_topics
+                    })
+                })
+
+                if (!res.ok) {
+                    return alert("Form not submitted, Please try again later!");
+                }
+
                 message = "Perfect! Check your email for access to our exclusive resources and learning materials.";
             }
 
