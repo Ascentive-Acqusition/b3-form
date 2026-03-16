@@ -1,942 +1,550 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Let's Connect</title>
-    <style>
-        * {
-            margin: 0;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>butterfly effect — field events</title>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black:#000000; --cream:#f5f0e8; --pewter:#afc1cb;
+  --earth:#341c12; --rust:#611e1f; --forest:#506054;
+  --deepmoss:#161e1b; --moss:#9ba781;
+  --muted:#666; --border:#d4cec4; --surface:#ffffff;
+  --ff:'Host Grotesk',sans-serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--cream); color:var(--black); font-family:var(--ff);
+  min-height:100vh; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:580px; margin:0 auto; padding:52px 28px 96px; }
 
-            padding: 0;
-            box-sizing: border-box;
-        }
+.header { display:flex; align-items:flex-end; justify-content:space-between;
+  padding-bottom:20px; margin-bottom:52px; border-bottom:1px solid var(--black); }
+.logo { font-size:13px; font-weight:500; letter-spacing:0.2px; color:var(--black); }
 
-        :root {
-            --primary-yellow: #FFD700;
-            --dark-bg: #0A0A0A;
-            --card-bg: #1A1A1A;
-            --text-primary: #FFFFFF;
-            --text-secondary: #B0B0B0;
-            --border-color: #2A2A2A;
-        }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: var(--dark-bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
+.hero { margin-bottom:52px; }
+.hero-eyebrow { font-size:10px; font-weight:400; letter-spacing:2.5px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+.hero h1 { font-size:clamp(30px,6vw,42px); font-weight:300; line-height:1.12;
+  letter-spacing:-0.8px; margin-bottom:18px; color:var(--black); }
+.hero h1 strong { font-weight:600; }
+.hero p { font-size:13px; font-weight:300; line-height:1.8;
+  color:var(--muted); max-width:440px; }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
+.work-rule { border:1px solid var(--border); border-left:2px solid var(--deepmoss);
+  background:rgba(22,30,27,0.04); padding:13px 18px; margin-bottom:40px;
+  font-size:11px; font-weight:400; letter-spacing:0.3px; line-height:1.7; color:var(--muted); }
+.work-rule strong { color:var(--deepmoss); font-weight:500; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+.section-label { font-size:9px; font-weight:500; letter-spacing:2.5px;
+  text-transform:uppercase; color:var(--muted); display:flex; align-items:center;
+  gap:12px; margin:36px 0 24px; }
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
-        .header h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
+.field { margin-bottom:22px; }
+.field label { display:block; font-size:9px; font-weight:500; letter-spacing:2px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.field input, .field select, .field textarea {
+  width:100%; background:var(--surface); border:1px solid var(--border);
+  color:var(--black); padding:13px 14px; font-family:var(--ff);
+  font-size:14px; font-weight:400; outline:none;
+  transition:border-color 0.15s ease; -webkit-appearance:none; border-radius:0; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color:var(--black); }
+.field input::placeholder, .field textarea::placeholder { color:#bbb; font-weight:300; }
+.field select {
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center;
+  padding-right:36px; cursor:pointer; color:var(--black); }
+.field select option { background:white; color:var(--black); }
+.field textarea { resize:vertical; min-height:100px; line-height:1.65; font-size:13px; }
+.sub-label { font-size:9px; font-weight:400; letter-spacing:1px;
+  text-transform:uppercase; color:#bbb; margin-top:5px; }
 
-        .header p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-        .route-note {
-            font-size: 11px;
-            color: #666;
-            margin-top: 8px;
-            font-style: italic;
-        }
+.type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.type-btn { background:var(--surface); border:1px solid var(--border);
+  padding:12px 10px; text-align:center; font-family:var(--ff);
+  font-size:11px; font-weight:400; color:var(--muted); cursor:pointer;
+  transition:all 0.15s ease; letter-spacing:0.1px; user-select:none; }
+.type-btn:hover { border-color:var(--deepmoss); color:var(--deepmoss); }
+.type-btn.on { background:var(--deepmoss); border-color:var(--deepmoss); color:var(--cream); }
 
-        .progress-container {
-            width: 100%;
-            height: 2px;
-            background: var(--border-color);
-            margin-bottom: 50px;
-            border-radius: 2px;
-            overflow: hidden;
-        }
+/* content type grid - 2 col */
+.content-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
 
-        .progress-bar {
-            height: 100%;
-            background: var(--primary-yellow);
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 0%;
-        }
+/* multi-select team grid */
+.team-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.team-btn { background:var(--surface); border:1px solid var(--border);
+  padding:10px 12px; text-align:left; font-family:var(--ff);
+  font-size:12px; font-weight:400; color:var(--muted); cursor:pointer;
+  transition:all 0.15s ease; user-select:none; display:flex;
+  align-items:center; gap:10px; }
+.team-btn:hover { border-color:var(--deepmoss); color:var(--deepmoss); }
+.team-btn.on { background:var(--deepmoss); border-color:var(--deepmoss); color:var(--cream); }
+.team-btn .dot { width:6px; height:6px; border-radius:50%;
+  background:currentColor; flex-shrink:0; opacity:0.5; }
+.team-btn.on .dot { opacity:1; }
 
-        .form-section {
-            display: none;
-            animation: fadeInUp 0.5s ease;
-        }
 
-        .form-section.active {
-            display: block;
-        }
+/* optional block */
+.optional-note { font-size:10px; color:#bbb; font-weight:300;
+  letter-spacing:0.3px; margin-top:5px; }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+.hint-box { background:rgba(22,30,27,0.03); border:1px solid var(--border);
+  padding:10px 14px; margin-top:8px; font-size:11px; font-weight:300;
+  line-height:1.7; color:var(--muted); }
+.hint-box strong { color:var(--deepmoss); font-weight:500; }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.error-msg { display:none; background:rgba(97,30,31,0.06);
+  border:1px solid rgba(97,30,31,0.25); color:var(--rust);
+  padding:12px 16px; font-size:12px; font-weight:400;
+  letter-spacing:0.2px; margin-bottom:20px; }
 
-        .question-block {
-            margin-bottom: 40px;
-        }
+.submit-area { display:flex; align-items:center; gap:20px; margin-top:12px; }
+.submit-btn { background:var(--black); color:var(--cream); border:none;
+  padding:15px 44px; font-family:var(--ff); font-size:11px; font-weight:500;
+  letter-spacing:2px; text-transform:uppercase; cursor:pointer;
+  transition:opacity 0.2s; flex-shrink:0; }
+.submit-btn:hover { opacity:0.75; }
+.submit-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.submit-note { font-size:10px; font-weight:300; color:var(--muted);
+  letter-spacing:0.3px; line-height:1.7; }
 
-        .question-label {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: block;
-        }
+#success { display:none; background:var(--deepmoss); padding:64px 40px;
+  text-align:center; animation:rise 0.4s ease; }
+@keyframes rise { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+#success .success-eyebrow { font-size:9px; font-weight:500; letter-spacing:3px;
+  text-transform:uppercase; color:var(--moss); margin-bottom:20px; }
+#success h2 { font-size:32px; font-weight:300; letter-spacing:-0.5px;
+  color:var(--cream); margin-bottom:14px; }
+#success p { font-size:13px; font-weight:300; line-height:1.8;
+  color:rgba(245,240,232,0.6); max-width:360px; margin:0 auto; }
 
-        .question-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
+.footer { margin-top:60px; padding-top:24px; border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center; }
+.footer-brand { font-size:10px; font-weight:400; color:var(--muted); letter-spacing:0.5px; }
+.footer-year { font-size:10px; color:var(--muted); letter-spacing:0.5px; }
 
-        .option-cards {
-            display: grid;
-            gap: 16px;
-        }
+/* conditional block */
+.conditional { display:none; }
+.conditional.show { display:block; }
 
-        .option-card {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .option-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-yellow), transparent);
-            opacity: 0.1;
-            transition: width 0.4s ease;
-        }
-
-        .option-card:hover {
-            border-color: var(--primary-yellow);
-            transform: translateX(4px);
-        }
-
-        .option-card:hover::before {
-            width: 100%;
-        }
-
-        .option-card.selected {
-            border-color: var(--primary-yellow);
-            background: rgba(255, 215, 0, 0.05);
-        }
-
-        .option-card input[type="radio"],
-        .option-card input[type="checkbox"] {
-            display: none;
-        }
-
-        .option-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .option-title::before {
-            content: '';
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .option-card.selected .option-title::before {
-            background: var(--primary-yellow);
-            border-color: var(--primary-yellow);
-            box-shadow: inset 0 0 0 4px var(--card-bg);
-        }
-
-        .option-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-left: 32px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="url"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 16px;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--primary-yellow);
-            background: rgba(255, 215, 0, 0.05);
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
-        }
-
-        .checkbox-group {
-            display: grid;
-            gap: 12px;
-        }
-
-        .checkbox-item {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-item:hover {
-            border-color: var(--primary-yellow);
-        }
-
-        .checkbox-item.selected {
-            border-color: var(--primary-yellow);
-            background: rgba(255, 215, 0, 0.05);
-        }
-
-        .checkbox-item label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 16px;
-            gap: 12px;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            appearance: none;
-            border: 2px solid var(--border-color);
-            border-radius: 4px;
-            background: var(--card-bg);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .checkbox-item input[type="checkbox"]:checked {
-            background: var(--primary-yellow);
-            border-color: var(--primary-yellow);
-            position: relative;
-        }
-
-        .checkbox-item input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--dark-bg);
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 16px;
-            margin-top: 50px;
-        }
-
-        button {
-            flex: 1;
-            padding: 16px 32px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-next {
-            background: var(--primary-yellow);
-            color: var(--dark-bg);
-        }
-
-        .btn-next:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .btn-next:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .btn-back {
-            background: transparent;
-            border: 2px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-back:hover {
-            border-color: var(--primary-yellow);
-            color: var(--primary-yellow);
-        }
-
-        .success-screen {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-yellow);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-        }
-
-        .success-icon svg {
-            width: 40px;
-            height: 40px;
-            stroke: var(--dark-bg);
-            stroke-width: 3;
-        }
-
-        .success-screen h2 {
-            font-size: 36px;
-            margin-bottom: 16px;
-        }
-
-        .success-screen p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .route-indicator {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--primary-yellow);
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 36px;
-            }
-
-            .question-label {
-                font-size: 20px;
-            }
-
-            .container {
-                padding: 40px 20px;
-            }
-
-            .button-group {
-                flex-direction: column-reverse;
-            }
-        }
-    </style>
+@media(max-width:500px){
+  .wrap{padding:40px 20px 72px}
+  .two{grid-template-columns:1fr}
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .content-grid{grid-template-columns:1fr}
+  .team-grid{grid-template-columns:1fr}
+  .submit-area{flex-direction:column;align-items:flex-start}
+  .hero h1{font-size:28px}
+  .header{flex-direction:column;align-items:flex-start;gap:8px}
+}
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>LET'S CONNECT</h1>
-            <p>Choose your path and we'll guide you through the right questions</p>
-        </div>
+<div class="wrap">
 
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
+  <div class="header">
+    <div class="logo">butterfly effect</div>
 
-        <form id="masterForm">
-            <!-- INITIAL ROUTE SELECTION -->
-            <div class="form-section active" data-section="route-select">
-                <div class="question-block">
-                    <label class="question-label">What brings you here today?</label>
-                    <p class="question-description">Select the option that best describes your needs</p>
+  </div>
 
-                    <div class="option-cards">
-                        <div class="option-card" onclick="selectRoute(this, 'client')">
-                            <input type="radio" name="route" value="client">
-                            <div class="option-title">I want to work with you</div>
-                            <div class="option-description">I'm looking for services and want to start a project with
-                                your team</div>
-                            <div class="route-note">(Lead magnet routed to here)</div>
-                        </div>
-
-                        <div class="option-card" onclick="selectRoute(this, 'partner')">
-                            <input type="radio" name="route" value="partner">
-                            <div class="option-title">I want to work for you / partner</div>
-                            <div class="option-description">Exploring job opportunities, freelance work, or creative
-                                partnerships</div>
-                        </div>
-
-                        <div class="option-card" onclick="selectRoute(this, 'learner')">
-                            <input type="radio" name="route" value="learner">
-                            <div class="option-title">I want to learn</div>
-                            <div class="option-description">Access resources, guides, and educational materials</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-next" onclick="startRoute()" disabled
-                        id="startBtn">Continue</button>
-                </div>
-            </div>
-
-            <!-- CLIENT PATH (Form A) - Single Page -->
-            <div class="form-section" data-section="client">
-                <span class="route-indicator">Client Path</span>
-
-                <div class="question-block">
-                    <label class="question-label">Let's start with the basics</label>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="client_name" placeholder="Your name *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="email" name="client_email" placeholder="Email address *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="client_company" placeholder="Company name *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="client_role" placeholder="Your role *" required>
-                    </div>
-
-                    <div>
-                        <input type="url" name="client_linkedin" placeholder="LinkedIn URL (optional)">
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">What's the main challenge you're facing?</label>
-                    <p class="question-description">Help us understand what's keeping you up at night</p>
-                    <textarea name="client_challenge" placeholder="Describe your biggest challenge..."
-                        required></textarea>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">How urgent is this for you?</label>
-                    <p class="question-description">This helps us prioritize and serve you better</p>
-                    <div class="option-cards">
-                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'very_urgent')">
-                            <input type="radio" name="client_urgency" value="very_urgent">
-                            <div class="option-title">Very urgent - need help now</div>
-                        </div>
-                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'somewhat_urgent')">
-                            <input type="radio" name="client_urgency" value="somewhat_urgent">
-                            <div class="option-title">Somewhat urgent - within the next few weeks</div>
-                        </div>
-                        <div class="option-card" onclick="selectOption(this, 'client_urgency', 'exploring')">
-                            <input type="radio" name="client_urgency" value="exploring">
-                            <div class="option-title">Just exploring - gathering information</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
-                    <button type="button" class="btn-next" onclick="submitForm()">Submit</button>
-                </div>
-            </div>
-
-            <!-- PARTNERSHIP PATH (Form B) - Single Page -->
-            <div class="form-section" data-section="partner">
-                <span class="route-indicator">Partnership Path</span>
-
-                <div class="question-block">
-                    <label class="question-label">Tell us about yourself</label>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="partner_name" placeholder="Your name *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="email" name="partner_email" placeholder="Email address *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="partner_company" placeholder="Current company (optional)">
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="url" name="partner_linkedin" placeholder="LinkedIn URL *" required>
-                    </div>
-
-                    <div>
-                        <input type="tel" name="partner_phone" placeholder="Phone number (optional)">
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">What type of opportunity are you looking for?</label>
-                    <p class="question-description">Select all that apply</p>
-
-                    <div class="checkbox-group">
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="partner_type" value="fulltime">
-                                Full-time Employment
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="partner_type" value="freelance">
-                                Freelance / Contract Work
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="partner_type" value="collaboration">
-                                Creative Collaboration
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="partner_type" value="influencer">
-                                Influencer / Creator Partnership
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="partner_type" value="internship">
-                                Internship
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">What role or position are you interested in?</label>
-                    <p class="question-description">e.g., Social Media Manager, Creative Director, Content Creator,
-                        Brand Strategist</p>
-                    <input type="text" name="partner_role" placeholder="Describe the role you're seeking..." required>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">Tell us about your experience</label>
-                    <p class="question-description">Share your relevant background, skills, and what makes you unique
-                    </p>
-                    <textarea name="partner_experience"
-                        placeholder="Describe your experience, skills, and achievements..." required></textarea>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">Portfolio URL (optional)</label>
-                    <p class="question-description">Share your work so we can see what you're all about</p>
-                    <input type="url" name="partner_portfolio" placeholder="https://...">
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">Why do you want to work with us?</label>
-                    <textarea name="partner_why" placeholder="What draws you to our company and this opportunity..."
-                        required></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
-                    <button type="button" class="btn-next" onclick="submitForm()">Submit</button>
-                </div>
-            </div>
-
-            <!-- LEARNER PATH (Form C) - Single Page -->
-            <div class="form-section" data-section="learner">
-                <span class="route-indicator">Learning Resources</span>
-
-                <div class="question-block">
-                    <label class="question-label">Get access to our resources</label>
-                    <p class="question-description">We'll send you exclusive content and learning materials</p>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="learner_name" placeholder="Your name *" required>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <input type="email" name="learner_email" placeholder="Email address *" required>
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <label class="question-label">What topics interest you?</label>
-                    <p class="question-description">Select all that apply to get personalized resources</p>
-
-                    <div class="checkbox-group">
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="learner_topics" value="marketing">
-                                Influencer Marketing
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="learner_topics" value="branding">
-                                Brand Strategy
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="learner_topics" value="creative">
-                                Creative Direction
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="learner_topics" value="social">
-                                Social Media Strategy
-                            </label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <label>
-                                <input type="checkbox" name="learner_topics" value="trends">
-                                Culture & Trends
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-back" onclick="goBack()">Back</button>
-                    <button type="button" class="btn-next" onclick="submitForm()">Get Resources</button>
-                </div>
-            </div>
-
-            <!-- SUCCESS SCREEN -->
-            <div class="form-section" data-section="success">
-                <div class="success-screen">
-                    <div class="success-icon">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-                    <h2>THANK YOU</h2>
-                    <p id="successMessage">We've received your submission and will be in touch soon.</p>
-                </div>
-            </div>
-        </form>
+  <div id="form-area">
+    <div class="hero">
+      <div class="hero-eyebrow" id="form-eyebrow">Field Events — Next Month</div>
+      <h1>Where will you be<br><strong>next month?</strong></h1>
+      <p>Log every Butterfly Effect work event you are attending next month — client meetings, catalyst events, brand activations, industry conferences. This feeds the content plan. Deadline is the 7th.</p>
     </div>
 
-    <script>
-        let currentRoute = '';
-        let currentSection = 'route-select';
+    <div class="work-rule">
+      <strong>Work events only.</strong> Client meetings, catalyst events, industry events, brand activations, and scheduled team meetups directly related to Butterfly Effect business. Personal events, holidays, and general travel do not count.
+    </div>
 
-        // Check for URL parameters on page load
-        window.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const route = urlParams.get('route');
+    <div class="error-msg" id="error-msg"></div>
 
-            if (route && ['client', 'partner', 'learner'].includes(route)) {
-                // Auto-select route and start
-                currentRoute = route;
-                document.querySelector(`input[value="${route}"]`).checked = true;
-                document.querySelector(`input[value="${route}"]`).parentElement.classList.add('selected');
+    <!-- YOUR DETAILS -->
+    <div class="section-label">Your details</div>
 
-                // Skip initial selection and go directly to form
-                hideAllSections();
-                showSection(route);
-                updateProgress();
-            }
-        });
+    <div class="field">
+      <label>Your name</label>
+      <select id="f-name">
+        <option value="" disabled selected>Select your name...</option>
+        <option>Michael Heaven</option>
+        <option>Elfried Samba</option>
+        <option>Derby Samba</option>
+        <option>Ala Papaj</option>
+        <option>Vuyo Malinga</option>
+        <option>Pablo Lorenzana</option>
+        <option>Rebecca Shipton</option>
+        <option>Ryan Koncar</option>
+        <option>Chris Freer</option>
+        <option>Katrina Francis</option>
+        <option>Lorna Karachi</option>
+        <option>Thomas Mcquade</option>
+        <option>Yaw Ofori-Darko</option>
+      </select>
+    </div>
 
-        function selectRoute(card, route) {
-            // Remove selected class from all cards
-            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    <!-- EVENT DETAILS -->
+    <div class="section-label">Event details</div>
 
-            // Add selected class to clicked card
-            card.classList.add('selected');
+    <div class="field">
+      <label>Event or meeting name</label>
+      <input type="text" id="f-event" placeholder="e.g. Formula E Jeddah ePrix, Nike Q2 Strategy Review">
+    </div>
 
-            // Set route
-            currentRoute = route;
-            card.querySelector('input').checked = true;
+    <div class="field">
+      <label>Event type</label>
+      <div class="type-grid">
+        <div class="type-btn" onclick="pickType(this)">Catalyst Event</div>
+        <div class="type-btn" onclick="pickType(this)">Client Meeting</div>
+        <div class="type-btn" onclick="pickType(this)">Industry Event</div>
+        <div class="type-btn" onclick="pickType(this)">Brand Activation</div>
+        <div class="type-btn" onclick="pickType(this)">Internal Meetup</div>
+        <div class="type-btn" onclick="pickType(this)">Other</div>
+      </div>
+    </div>
 
-            // Enable start button
-            document.getElementById('startBtn').disabled = false;
-        }
+    <div class="field">
+      <label>Client or brand involved</label>
+      <input type="text" id="f-client" placeholder="e.g. Formula E, Nike — leave blank if not applicable">
+      <div class="optional-note">Optional</div>
+    </div>
 
-        function startRoute() {
-            hideAllSections();
-            showSection(currentRoute);
-            updateProgress();
-        }
+    <!-- DATES & LOCATION -->
+    <div class="section-label">Dates and location</div>
 
-        function goBack() {
-            hideAllSections();
-            currentRoute = '';
-            currentSection = 'route-select';
-            document.getElementById('startBtn').disabled = true;
-            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-            showSection('route-select');
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    <div class="field">
+      <label>Event duration</label>
+      <div class="two">
+        <div>
+          <input type="date" id="f-start">
+          <div class="sub-label">From</div>
+        </div>
+        <div>
+          <input type="date" id="f-end">
+          <div class="sub-label">To</div>
+        </div>
+      </div>
+    </div>
 
-        function hideAllSections() {
-            document.querySelectorAll('.form-section').forEach(section => {
-                section.classList.remove('active');
-            });
-        }
+    <div class="field">
+      <label>Country</label>
+      <select id="f-country">
+        <option value="" disabled selected>Select country...</option>
+        <optgroup label="United Kingdom">
+          <option>United Kingdom</option>
+        </optgroup>
+        <optgroup label="Europe">
+          <option>France</option>
+          <option>Germany</option>
+          <option>Spain</option>
+          <option>Italy</option>
+          <option>Netherlands</option>
+          <option>Belgium</option>
+          <option>Portugal</option>
+          <option>Switzerland</option>
+          <option>Sweden</option>
+          <option>Norway</option>
+          <option>Denmark</option>
+          <option>Poland</option>
+          <option>Austria</option>
+          <option>Greece</option>
+          <option>Czech Republic</option>
+          <option>Hungary</option>
+          <option>Romania</option>
+          <option>Turkey</option>
+        </optgroup>
+        <optgroup label="Middle East & Africa">
+          <option>United Arab Emirates</option>
+          <option>Saudi Arabia</option>
+          <option>Qatar</option>
+          <option>Bahrain</option>
+          <option>Kuwait</option>
+          <option>South Africa</option>
+          <option>Nigeria</option>
+          <option>Ghana</option>
+          <option>Kenya</option>
+          <option>Egypt</option>
+          <option>Morocco</option>
+        </optgroup>
+        <optgroup label="North America">
+          <option>United States</option>
+          <option>Canada</option>
+          <option>Mexico</option>
+        </optgroup>
+        <optgroup label="Caribbean & Latin America">
+          <option>Brazil</option>
+          <option>Argentina</option>
+          <option>Colombia</option>
+          <option>Jamaica</option>
+          <option>Trinidad and Tobago</option>
+          <option>Barbados</option>
+        </optgroup>
+        <optgroup label="Asia Pacific">
+          <option>Japan</option>
+          <option>China</option>
+          <option>South Korea</option>
+          <option>India</option>
+          <option>Singapore</option>
+          <option>Australia</option>
+          <option>New Zealand</option>
+          <option>Hong Kong</option>
+          <option>Thailand</option>
+          <option>Indonesia</option>
+        </optgroup>
+        <option value="Other">Other</option>
+      </select>
+    </div>
 
-        function showSection(sectionId) {
-            currentSection = sectionId;
-            const section = document.querySelector(`[data-section="${sectionId}"]`);
-            if (section) {
-                section.classList.add('active');
-            }
-        }
+    <div class="field">
+      <label>City</label>
+      <input type="text" id="f-city" placeholder="e.g. Madrid, Dubai, New York">
+    </div>
 
-        function updateProgress() {
-            let progress = 0;
+    <!-- TEAM & CONTENT -->
+    <div class="section-label">Team and content</div>
 
-            if (currentSection === 'route-select') {
-                progress = 0;
-            } else if (currentSection === 'success') {
-                progress = 100;
-            } else if (currentRoute) {
-                // Single page form, so it's 50% when on form, 100% when submitted
-                progress = 50;
-            }
+    <div class="field">
+      <label>Other Butterfly Effect team attending</label>
+      <div class="team-grid" id="team-grid">
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Michael Heaven">
+          <span class="dot"></span><span>Michael Heaven</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Elfried Samba">
+          <span class="dot"></span><span>Elfried Samba</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Derby Samba">
+          <span class="dot"></span><span>Derby Samba</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Ala Papaj">
+          <span class="dot"></span><span>Ala Papaj</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Vuyo Malinga">
+          <span class="dot"></span><span>Vuyo Malinga</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Pablo Lorenzana">
+          <span class="dot"></span><span>Pablo Lorenzana</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Ryan Koncar">
+          <span class="dot"></span><span>Ryan Koncar</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Chris Freer">
+          <span class="dot"></span><span>Chris Freer</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Rebecca Shipton">
+          <span class="dot"></span><span>Rebecca Shipton</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Katrina Francis">
+          <span class="dot"></span><span>Katrina Francis</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Lorna Karachi">
+          <span class="dot"></span><span>Lorna Karachi</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Thomas Mcquade">
+          <span class="dot"></span><span>Thomas Mcquade</span>
+        </div>
+        <div class="team-btn" onclick="toggleTeam(this)" data-name="Yaw Ofori-Darko">
+          <span class="dot"></span><span>Yaw Ofori-Darko</span>
+        </div>
+      </div></div>
+      <div class="optional-note" style="margin-top:10px;">Select all that apply. Leave blank if attending solo.</div>
+    </div>
 
-            document.getElementById('progressBar').style.width = progress + '%';
-        }
+    <div class="field">
+      <label>What type of content can this event produce?</label>
+      <div class="content-grid" id="content-grid">
+        <div class="type-btn" onclick="toggleContent(this)">BTS / Behind the Scenes</div>
+        <div class="type-btn" onclick="toggleContent(this)">Talking Head / Explainer</div>
+        <div class="type-btn" onclick="toggleContent(this)">Crowd / Atmosphere</div>
+        <div class="type-btn" onclick="toggleContent(this)">Client Interaction</div>
+        <div class="type-btn" onclick="toggleContent(this)">Product / Activation</div>
+        <div class="type-btn" onclick="toggleContent(this)">Results / Outcomes</div>
+      </div>
+      <div class="optional-note" style="margin-top:8px;">Select all that apply.</div>
+    </div>
 
-        function validateCurrentSection() {
-            const currentSectionEl = document.querySelector(`[data-section="${currentSection}"]`);
-            const requiredInputs = currentSectionEl.querySelectorAll('input[required], textarea[required], select[required]');
+    <!-- CONTEXT -->
+    <div class="section-label">Context</div>
 
-            let isValid = true;
-            requiredInputs.forEach(input => {
-                if (!input.value.trim() && input.type !== 'checkbox' && input.type !== 'radio') {
-                    isValid = false;
-                    input.style.borderColor = '#ff6b6b';
-                    setTimeout(() => {
-                        input.style.borderColor = '';
-                    }, 2000);
-                }
-            });
+    <div class="field">
+      <label>What is happening and why</label>
+      <textarea id="f-reason" placeholder="What is the purpose of this event? What is Butterfly Effect's involvement? What moments are likely to happen? The more specific, the better — this feeds the content brief directly."></textarea>
+      <div class="hint-box">
+        <strong>Be specific.</strong> Instead of "attending Formula E" try "We're running the social activation at Formula E Madrid — managing creator content, fan engagement, and capturing race-day energy for Formula E's channels." The system uses this to write the capture brief.
+      </div>
+    </div>
 
-            if (!isValid) {
-                alert('Please fill in all required fields');
-            }
+    <div class="field">
+      <label>Any specific shots or moments you know will happen?</label>
+      <textarea id="f-shots" placeholder="e.g. Trophy presentation at 4pm, pit lane walk at 9am, founder panel at 2pm — anything you know is planned and worth capturing." style="min-height:80px;"></textarea>
+      <div class="optional-note">Optional — but very useful if you know the schedule.</div>
+    </div>
 
-            return isValid;
-        }
+    <!-- SUBMIT -->
+    <div class="submit-area">
+      <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">Submit</button>
+      <div class="submit-note">Work events only.<br>Deadline 7th of the month.</div>
+    </div>
+  </div>
 
-        function toggleCheckbox(item) {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
+  <!-- SUCCESS -->
+  <div id="success">
+    <div class="success-eyebrow">Received</div>
+    <h2 id="success-heading">Submitted.</h2>
+    <p id="success-msg">Your event is logged. Briefs will be sent to the team on the 8th.</p>
+  </div>
 
-            if (checkbox.checked) {
-                item.classList.add('selected');
-            } else {
-                item.classList.remove('selected');
-            }
-        }
+  <div class="footer">
+    <div class="footer-brand">butterfly effect</div>
+    <div class="footer-year">2026</div>
+  </div>
+</div>
 
-        function selectOption(card, name, value) {
-            // Remove selected class from all cards with the same name
-            document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-                input.parentElement.classList.remove('selected');
-            });
+<script>
+// ── REPLACE with your Google Apps Script URL ──
+const SHEET_URL = 'YOUR_APPS_SCRIPT_URL';
 
-            // Add selected class to clicked card
-            card.classList.add('selected');
+let selectedType = '';
+let selectedContent = [];
+let selectedTeam = [];
 
-            // Set the radio button value
-            const radio = card.querySelector('input[type="radio"]');
-            if (radio) {
-                radio.checked = true;
-            }
-        }
+// Set deadline label dynamically
+(function(){
+  const now = new Date();
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  // next month
+  const next = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  const label = months[next.getMonth()] + ' ' + next.getFullYear();
+  document.getElementById('form-eyebrow').textContent = 'Field Events — ' + label;
+  // deadline = 7th of current month
+  document.getElementById('deadline-label').textContent =
+    '7 ' + months[now.getMonth()];
+})();
 
-        async function submitForm() {
-            if (!validateCurrentSection()) {
-                return;
-            }
+function pickType(el) {
+  document.querySelectorAll('.type-grid .type-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  selectedType = el.textContent.trim();
+}
 
-            // Collect form data
-            const formData = new FormData(document.getElementById('masterForm'));
-            const data = {
-                route: currentRoute,
-                timestamp: new Date().toISOString(),
-                urlParam: `?route=${currentRoute}` // For reference
-            };
+function toggleContent(el) {
+  el.classList.toggle('on');
+  const val = el.textContent.trim();
+  if (el.classList.contains('on')) {
+    if (!selectedContent.includes(val)) selectedContent.push(val);
+  } else {
+    selectedContent = selectedContent.filter(v => v !== val);
+  }
+}
 
-            for (let [key, value] of formData.entries()) {
-                if (formData.getAll(key).length > 1) {
-                    data[key] = formData.getAll(key);
-                } else {
-                    data[key] = value;
-                }
-            }
+function toggleTeam(el) {
+  // Don't let someone select themselves — we filter by name match after submit
+  el.classList.toggle('on');
+  const val = el.dataset.name;
+  if (el.classList.contains('on')) {
+    if (!selectedTeam.includes(val)) selectedTeam.push(val);
+  } else {
+    selectedTeam = selectedTeam.filter(v => v !== val);
+  }
+}
 
-            // Log to console (in production, send to your backend)
-            console.log('Form submitted:', data);
-            console.log('Direct URL parameter for this route:', `?route=${currentRoute}`);
+// Auto-remove submitter from team list on submit
+function getOtherTeam(submitterName) {
+  return selectedTeam.filter(n => n !== submitterName).join(', ');
+}
 
-            // Set success message based on route
-            let message = '';
-            if (currentRoute === 'client') {
+async function handleSubmit() {
+  const name    = document.getElementById('f-name').value;
+  const event   = document.getElementById('f-event').value.trim();
+  const client  = document.getElementById('f-client').value.trim();
+  const start   = document.getElementById('f-start').value;
+  const end     = document.getElementById('f-end').value;
+  const city    = document.getElementById('f-city').value.trim();
+  const country = document.getElementById('f-country').value.trim();
+  const reason  = document.getElementById('f-reason').value.trim();
+  const shots   = document.getElementById('f-shots').value.trim();
+  const errEl   = document.getElementById('error-msg');
 
+  errEl.style.display = 'none';
 
-                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        path: "A",
-                        name: data.client_name,
-                        email: data.client_email,
-                        company_name: data.client_company,
-                        role: data.client_role,
-                        linkedin_url: data.client_linkedin,
-                        main_challange: data.client_challenge,
-                        urgency: data.client_urgency,
-                    })
-                })
+  if (!name)         { showErr('Please select your name.'); return; }
+  if (!event)        { showErr('Please enter the event or meeting name.'); return; }
+  if (!selectedType) { showErr('Please select an event type.'); return; }
+  if (!start||!end)  { showErr('Please enter both a start and end date.'); return; }
+  if (end < start)   { showErr('End date must be on or after start date.'); return; }
+  if (!city)         { showErr('Please enter the city.'); return; }
+  if (!country)      { showErr('Please select a country.'); return; }
+  if (!reason)       { showErr('Please describe what is happening and why — this feeds the content brief.'); return; }
 
-                const resData = await res.json();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
-                if (!res.ok) {
-                    return alert("Form not submitted, Please try again later!");
-                }
+  // Determine next month label
+  const now = new Date();
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const next = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  const monthLabel = months[next.getMonth()] + ' ' + next.getFullYear();
 
+  const payload = {
+    timestamp:   new Date().toISOString(),
+    name,
+    event,
+    type:        selectedType,
+    client,
+    start,
+    end,
+    city,
+    country,
+    others:      getOtherTeam(name),
+    contentTypes: selectedContent.join(', '),
+    reason,
+    shots,
+    month:       monthLabel,
+  };
 
+  try {
+    if (SHEET_URL === 'YOUR_APPS_SCRIPT_URL') {
+      await new Promise(r => setTimeout(r, 600));
+    } else {
+      await fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    showSuccess(name);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    showErr('Something went wrong. Please try again.');
+  }
+}
 
-                message = "Thank you for your interest! We'll review your needs and get back to you within 24 hours to discuss how we can help.";
-            } else if (currentRoute === 'partner') {
-                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        path: "B",
-                        name: data.partner_name,
-                        email: data.partner_email,
-                        current_company: data.partner_company,
-                        linkedin_url: data.partner_linkedin,
-                        phone: data.partner_phone,
-                        oppurtunity_type: data.partner_type,
-                        role_interest: data.partner_role,
-                        experience: data.partner_experience,
-                        portfolio_url: data.partner_portfolio,
+function showErr(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 
-                    })
-                })
-
-                if (!res.ok) {
-                    return alert("Form not submitted, Please try again later!");
-                }
-
-                // console.log(data);
-                message = "Thanks for reaching out! We'll review your application and contact you if there's a good fit for our team.";
-            } else if (currentRoute === 'learner') {
-                const res = await fetch('https://vuyobutterfly.app.n8n.cloud/webhook/b3-intake', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        path: "C",
-                        name: data.learner_name,
-                        email: data.learner_email,
-                        topics: data.learner_topics
-                    })
-                })
-
-                if (!res.ok) {
-                    return alert("Form not submitted, Please try again later!");
-                }
-
-                message = "Perfect! Check your email for access to our exclusive resources and learning materials.";
-            }
-
-            document.getElementById('successMessage').textContent = message;
-
-            // Show success screen
-            hideAllSections();
-            showSection('success');
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Initialize
-        updateProgress();
-    </script>
+function showSuccess(name) {
+  document.getElementById('form-area').style.display = 'none';
+  const s = document.getElementById('success');
+  s.style.display = 'block';
+  const first = name.split(' ')[0];
+  document.getElementById('success-heading').textContent = 'Thank you, ' + first + '.';
+  document.getElementById('success-msg').textContent =
+    'Your event is logged. Content briefs will be sent to the team on the 8th.';
+  s.scrollIntoView({ behavior:'smooth' });
+}
+</script>
 </body>
-
 </html>
