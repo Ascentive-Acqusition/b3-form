@@ -406,7 +406,7 @@ body { background:var(--cream); color:var(--black); font-family:var(--ff);
 
 <script>
 // ── REPLACE with your Google Apps Script URL ──
-const SHEET_URL = 'YOUR_APPS_SCRIPT_URL';
+const SHEET_URL = 'https://script.google.com/a/macros/butterflyeffect.xyz/s/AKfycbyRYsUgU4X78kQYwVaBcywqJoPv_Wi0YGpQTofRxMbFmUVCjmefnC17YDocCo9of-mD/exec';
 
 let selectedType = '';
 let selectedContent = [];
@@ -510,7 +510,7 @@ async function handleSubmit() {
   };
 
   try {
-    if (SHEET_URL === 'YOUR_APPS_SCRIPT_URL') {
+    if (SHEET_URL === 'https://script.google.com/a/macros/butterflyeffect.xyz/s/AKfycbyRYsUgU4X78kQYwVaBcywqJoPv_Wi0YGpQTofRxMbFmUVCjmefnC17YDocCo9of-mD/exec') {
       await new Promise(r => setTimeout(r, 600));
     } else {
       await fetch(SHEET_URL, {
