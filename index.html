@@ -406,7 +406,7 @@ body { background:var(--cream); color:var(--black); font-family:var(--ff);
 
 <script>
 // ── REPLACE with your Google Apps Script URL ──
-const SHEET_URL = 'https://script.google.com/a/macros/butterflyeffect.xyz/s/AKfycbyRYsUgU4X78kQYwVaBcywqJoPv_Wi0YGpQTofRxMbFmUVCjmefnC17YDocCo9of-mD/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyEjtYR-wfiDJ50RLiJJFf0GoBajCU9qw-vuhbJGTo0sdgxWWNzF4PL1IL6JvvR6FoX/exec';
 
 let selectedType = '';
 let selectedContent = [];
@@ -458,7 +458,7 @@ function getOtherTeam(submitterName) {
   return selectedTeam.filter(n => n !== submitterName).join(', ');
 }
 
-async function handleSubmit() {
+function handleSubmit() {
   const name    = document.getElementById('f-name').value;
   const event   = document.getElementById('f-event').value.trim();
   const client  = document.getElementById('f-client').value.trim();
@@ -509,23 +509,33 @@ async function handleSubmit() {
     month:       monthLabel,
   };
 
-  try {
-    if (SHEET_URL === 'https://script.google.com/a/macros/butterflyeffect.xyz/s/AKfycbyRYsUgU4X78kQYwVaBcywqJoPv_Wi0YGpQTofRxMbFmUVCjmefnC17YDocCo9of-mD/exec') {
-      await new Promise(r => setTimeout(r, 600));
+  // JSONP — bypasses CORS
+  const cbName = 'be_cb_' + Date.now();
+  const encoded = encodeURIComponent(JSON.stringify(payload));
+  const url = SHEET_URL + '?callback=' + cbName + '&data=' + encoded;
+
+  window[cbName] = function(res) {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (res && res.status === 'ok') {
+      showSuccess(name);
     } else {
-      await fetch(SHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      btn.disabled = false;
+      btn.textContent = 'Submit';
+      showErr('Something went wrong. Please try again.');
     }
-    showSuccess(name);
-  } catch(e) {
+  };
+
+  const script = document.createElement('script');
+  script.src = url;
+  script.onerror = function() {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
     btn.disabled = false;
     btn.textContent = 'Submit';
     showErr('Something went wrong. Please try again.');
-  }
+  };
+  document.head.appendChild(script);
 }
 
 function showErr(msg) {
